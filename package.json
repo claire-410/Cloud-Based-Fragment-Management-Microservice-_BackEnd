@@ -8,10 +8,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rezi410/fragments.git" 
+    "url": "git+https://github.com/rezi410/fragments.git"
   },
   "author": "Reziyemu Sulaiman",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "prettier": "3.2.5"
+  }
 }
-
-
