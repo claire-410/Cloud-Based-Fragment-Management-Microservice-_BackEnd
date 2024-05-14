@@ -13,6 +13,7 @@ const app = require('./app');
 const port = parseInt(process.env.PORT || '8080', 10);
 
 
+// Todo: print all of the process' environment variables
 if (process.env.LOG_LEVEL === 'debug') {
   console.log("Environment Variables:");
   for (const key in process.env) {
