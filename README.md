@@ -1,47 +1,30 @@
-# fragments
+Here are the instructions on how to run the various npm scripts I've created in the `package.json`:
 
-*(This is the repo for the for the backend/api.)*
+1. **Lint**:
+   To run the lint script, open the terminal or command prompt, navigate to the project directory, and then run the following command:
+   ```
+   npm run lint
+   ```
+   This will run ESLint to check the JavaScript files in the `src` directory according to the configuration specified in `eslint.config.mjs`.
 
-In a Node.js project, scripts like `lint`, `start`, `dev`, and `debug` are often defined in the `package.json` file under the `"scripts"` field. These scripts are usually used to perform common tasks like linting code, starting the application, running it in development mode, or debugging it. Here's how we can run each of them:
+2. **Start**:
+   To start the server normally, run:
+   ```
+   npm start
+   ```
+   This will execute the `node src/server.js` command, which starts the server without any additional features like watching for file changes or debugging.
 
-1. **Lint**: Linting is the process of checking our code for potential errors, bugs, stylistic errors, or suspicious constructs. It helps in maintaining code quality and consistency.
+3. **Dev**:
+   To start the server with nodemon, which watches the `src/**` folder for any changes and restarts the server automatically, run:
+   ```
+   npm run dev
+   ```
+   This will set the `LOG_LEVEL` environment variable to `debug` and then execute `nodemon ./src/server.js --watch src`.
 
-To run the lint script, we typically use a linter like ESLint or JSHint. First, ensure that the necessary dependencies are installed. Then, we can run the lint script using npm or yarn. Here's an example:
+4. **Debug**:
+   To start the server with nodemon and the Node.js inspector enabled on port 9229, allowing you to attach a debugger like VSCode, run:
+   ```
+   npm run debug
+   ```
+   This will also set the `LOG_LEVEL` environment variable to `debug` and then execute `nodemon --inspect=0.0.0.0:9229 ./src/server.js --watch src`.
 
-```bash
-npm run lint
-# or
-yarn lint
-```
-
-2. **Start**: The start script is used to start Node.js application. This script is often used in production environments to launch the application.
-
-To run the start script, we simply execute:
-
-```bash
-npm start
-# or
-yarn start
-```
-
-3. **Dev**: The dev script is commonly used during development. It usually starts the application in a development mode, which might include features like automatic reloading when files change.
-
-To run the dev script:
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-4. **Debug**: The debug script is used to start the application in debug mode, which allows us to attach a debugger and inspect the running code.
-
-To run the debug script:
-
-```bash
-npm run debug
-# or
-yarn debug
-```
-
-Note: The behavior of these scripts depends on how they are defined in our `package.json` file. We can customize the scripts to suit the needs of our project. 
