@@ -2,7 +2,7 @@
 
 (This is the repo for the backend/api.)
 
-Here are the instructions on how to run the various npm scripts I've created in the `package.json`:
+## Here are the instructions on how to run the various npm scripts I've created in the `package.json`:
 
 1. **Lint**:
    To run the lint script, open the terminal or command prompt, navigate to the project directory, and then run the following command:
