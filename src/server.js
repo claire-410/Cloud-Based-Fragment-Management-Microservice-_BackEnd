@@ -14,11 +14,16 @@ const port = parseInt(process.env.PORT || '8080', 10);
 
 
 // Todo: print all of the process' environment variables
-if (process.env.LOG_LEVEL === 'debug') {
-  console.log("Environment Variables:");
-  for (const key in process.env) {
-    console.log(`${key}: ${process.env[key]}`);
-  }
+// if (process.env.LOG_LEVEL === 'debug') {
+//   console.log("Environment Variables:");
+//   for (const key in process.env) {
+//     console.log(`${key}: ${process.env[key]}`);
+//   }
+// }
+
+// Alternative to print "environment variables" for the code above
+if (process.env.LOG_LEVEL == 'debug') {
+  logger.info(process.env, 'Environment Variables');
 }
 
 
