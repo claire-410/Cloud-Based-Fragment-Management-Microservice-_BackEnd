@@ -1,18 +1,22 @@
-const request = require('supertest');
-// const express = require('express');
+// tests/unit/app.test.js
 
+const request = require('supertest');
+
+// Get our Express app object (we don't need the server part)
 const app = require('../../src/app');
 
-describe('GET /non-existent-route', () => {
-  it('should return 404 status and not found error message', async () => {
-    const response = await request(app).get('/non-existent-route');
-    expect(response.status).toBe(404);
-    expect(response.body).toEqual({
-      status: 'error',
-      error: {
+describe('404 middleware', ()=>{
+  test('should return 404 for unknown errors', async()=>{
+    const res = await request(app).get('/unknown');
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({
+       status: 'error',
+       error: {
         message: 'not found',
         code: 404,
-      },
-    });
-  });
-});
+       },
+    })
+  })
+})
+
+
