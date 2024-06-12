@@ -154,6 +154,7 @@ class Fragment {
     // TODO
     if (this.mimeType === 'text/plain')
         return ['text/plain'];
+    return [];
   }
 
   /**
