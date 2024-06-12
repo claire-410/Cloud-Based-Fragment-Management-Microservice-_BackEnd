@@ -1,10 +1,8 @@
 // src/routes/index.js
 
+const express = require('express');
 // Our authentication middleware
 const { authenticate } = require('../auth');
-
-const express = require('express');
-
 // version and author from package.json
 const { version, author } = require('../../package.json');
 

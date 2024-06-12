@@ -21,10 +21,10 @@ const port = parseInt(process.env.PORT || '8080', 10);
 //   }
 // }
 
-// Alternative to print "environment variables" for the code above
-if (process.env.LOG_LEVEL == 'debug') {
-  logger.info(process.env, 'Environment Variables');
-}
+// // Alternative to print "environment variables" for the code above
+// if (process.env.LOG_LEVEL == 'debug') {
+//   logger.info(process.env, 'Environment Variables');
+// }
 
 
 
