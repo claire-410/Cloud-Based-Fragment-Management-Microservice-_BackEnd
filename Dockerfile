@@ -1,37 +1,50 @@
-FROM node
+# Use an official Node.js runtime as the parent image
+# Use multi-stage builds to reduce the final image size
+FROM node:18 AS build
+
 LABEL maintainer="Reziyemu Sulaiman <reziyemu.sulaiman@gmail.com>"
 LABEL description="Fragments node.js microservice"
 
-# We default to use port 8080 in our service
-ENV PORT=8080
+# Set environment variables
+ENV PORT=8080 \
+    NPM_CONFIG_LOGLEVEL=warn \
+    NPM_CONFIG_COLOR=false
 
-# Reduce npm spam when installing within Docker
-# https://docs.npmjs.com/cli/v8/using-npm/config#loglevel
-ENV NPM_CONFIG_LOGLEVEL=warn
-
-# Disable colour when run inside Docker
-# https://docs.npmjs.com/cli/v8/using-npm/config#color
-ENV NPM_CONFIG_COLOR=false
-
-# Use /app as our working directory
+# Set working directory
 WORKDIR /app
 
-# Option 1: explicit path - Copy the package.json and package-lock.json
-# files into /app. NOTE: the trailing `/` on `/app/`, which tells Docker
-# that `app` is a directory and not a file.
-COPY package*.json /app/
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-# Install node dependencies defined in package-lock.json
+# Install dependencies
 RUN npm install
 
-# Copy src to /app/src/
-COPY ./src ./src
+# Copy the rest of the application source code
+COPY . .
 
-# Copy our HTPASSWD file
-COPY ./tests/.htpasswd ./tests/.htpasswd
+# Build the application (if necessary)
+RUN npm run build
 
-# Start the container by running our server
-CMD npm start
+# Use a smaller Node.js runtime for the final image
+FROM node:18-slim
 
-# We run our service on port 8080
+LABEL maintainer="Reziyemu Sulaiman <reziyemu.sulaiman@gmail.com>"
+LABEL description="Fragments node.js microservice"
+
+# Set environment variables
+ENV PORT=8080 \
+    NPM_CONFIG_LOGLEVEL=warn \
+    NPM_CONFIG_COLOR=false
+
+# Set working directory
+WORKDIR /app
+
+# Copy only the necessary files from the build stage
+COPY --from=build /app .
+
+# Expose the port the service will run on
 EXPOSE 8080
+
+# Command to run the application
+CMD ["npm", "start"]
+
