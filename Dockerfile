@@ -1,6 +1,6 @@
 # Use an official Node.js runtime as the parent image
 # Use multi-stage builds to reduce the final image size
-FROM node:18 AS build
+FROM node:14 AS build
 
 LABEL maintainer="Reziyemu Sulaiman <reziyemu.sulaiman@gmail.com>"
 LABEL description="Fragments node.js microservice"
@@ -26,7 +26,7 @@ COPY . .
 RUN npm run build
 
 # Use a smaller Node.js runtime for the final image
-FROM node:18-slim
+FROM node:14-slim
 
 LABEL maintainer="Reziyemu Sulaiman <reziyemu.sulaiman@gmail.com>"
 LABEL description="Fragments node.js microservice"
@@ -47,4 +47,3 @@ EXPOSE 8080
 
 # Command to run the application
 CMD ["npm", "start"]
-
