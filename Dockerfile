@@ -1,7 +1,7 @@
 # Dockerfile
 
 # Use node version 18.13.0
-FROM node:18.13.0
+FROM node:18.13.0 AS dependencies
 
 LABEL maintainer="Reziyemu Sulaiman <rsulaiman2@myseneca.ca>"
 LABEL description="Fragments node.js microservice"
@@ -42,7 +42,7 @@ RUN npm ci --only=production
 
 ##############################################################
 
-FROM node:18.13.0
+FROM node:18.13.0 AS production
 
 # Use /app as our working directory
 WORKDIR /app
