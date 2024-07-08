@@ -1,46 +1,62 @@
-# Use an official Node.js runtime as the parent image
-# Use multi-stage builds to reduce the final image size
-FROM node:18 AS build
+# Dockerfile
 
-LABEL maintainer="Reziyemu Sulaiman <reziyemu.sulaiman@gmail.com>"
+# Use node version 18.13.0
+FROM node:18.13.0
+
+LABEL maintainer="Reziyemu Sulaiman <rsulaiman2@myseneca.ca>"
 LABEL description="Fragments node.js microservice"
 
-# Set environment variables
-ENV PORT=8080 \
-    NPM_CONFIG_LOGLEVEL=warn \
-    NPM_CONFIG_COLOR=false
+# We default to use port 8080 in our service
+ENV PORT=8080
 
-# Set working directory
+# Reduce npm spam when installing within Docker
+# https://docs.npmjs.com/cli/v8/using-npm/config#loglevel
+ENV NPM_CONFIG_LOGLEVEL=warn
+
+# Disable colour when run inside Docker
+# https://docs.npmjs.com/cli/v8/using-npm/config#color
+ENV NPM_CONFIG_COLOR=false
+
+# Use /app as our working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Option 1: explicit path - Copy the package.json and package-lock.json
+# files into /app. NOTE: the trailing `/` on `/app/`, which tells Docker
+# that `app` is a directory and not a file.
+COPY package*.json /app/
+
+# Option 2: relative path - Copy the package.json and package-lock.json
+# files into the working dir (/app).  NOTE: this requires that we have
+# already set our WORKDIR in a previous step.
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Option 3: explicit filenames - Copy the package.json and package-lock.json
+# files into the working dir (/app), using full paths and multiple source
+# files.  All of the files will be copied into the working dir `./app`
+COPY package.json package-lock.json ./
 
-# Copy the rest of the application source code
-COPY . .
+# # Install node dependencies defined in package-lock.json
+# RUN npm install
+# Enforce only production dependencies are installed
+RUN npm ci --only=production
 
-# Use a smaller Node.js runtime for the final image
-FROM node:18-slim
+##############################################################
 
-LABEL maintainer="Reziyemu Sulaiman <reziyemu.sulaiman@gmail.com>"
-LABEL description="Fragments node.js microservice"
+FROM node:18.13.0
 
-# Set environment variables
-ENV PORT=8080 \
-    NPM_CONFIG_LOGLEVEL=warn \
-    NPM_CONFIG_COLOR=false
-
-# Set working directory
+# Use /app as our working directory
 WORKDIR /app
 
-# Copy only the necessary files from the build stage
-COPY --from=build /app .
+COPY --from=dependencies /app /app
 
-# Expose the port the service will run on
-EXPOSE 8080
+# Copy src to /app/src/
+COPY ./src ./src
 
-# Command to run the application
+# Copy our HTPASSWD file
+COPY ./tests/.htpasswd ./tests/.htpasswd
+
+# Start the container by running our server
 CMD ["npm", "start"]
+
+# We run our service on port 8080
+EXPOSE 8080
