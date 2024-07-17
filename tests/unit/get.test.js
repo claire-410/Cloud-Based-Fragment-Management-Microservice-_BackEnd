@@ -21,4 +21,32 @@ describe('GET /v1/fragments', () => {
   });
 
   // TODO: we'll need to add tests to check the contents of the fragments array later
+
+  test('authenticated users get .html markdown', async () => {
+    const res = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set({ 'Content-Type': 'text/plain' })
+      .send('Text/plain test');
+    const id = JSON.parse(res.text).fragment.id;
+
+    const res2 = await request(app)
+      .get('/v1/fragments/' + id + '.html')
+      .auth('user1@email.com', 'password1');
+    expect(res2.statusCode).toBe(200);
+  });
+
+  test('authenticated users get incorrect/unsupported conversion type', async () => {
+    const res = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set({ 'Content-Type': 'text/plain' })
+      .send('Text/plain test');
+    const id = JSON.parse(res.text).fragment.id;
+
+    const res2 = await request(app)
+      .get('/v1/fragments/' + id + '.xml')
+      .auth('user1@email.com', 'password1');
+    expect(res2.statusCode).toBe(415);
+  });
 });

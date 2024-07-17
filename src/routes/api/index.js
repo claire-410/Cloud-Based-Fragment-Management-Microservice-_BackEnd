@@ -30,9 +30,10 @@ const rawBody = () =>
 router.get('/fragments', require('./get'));
 // Other routes (POST, DELETE, etc.) will go here later on...
 
-  // Use a raw body parser for POST, which will give a `Buffer` Object or `{}` at `req.body`
+// Use a raw body parser for POST, which will give a `Buffer` Object or `{}` at `req.body`
+router.get('/fragments/:id', require('./getid'));
 router.post('/fragments', rawBody(), require('./post'));
-router.get('/fragments/:id', require('./get-by-id'));
+router.get('/fragments/:id/info', require('./getinfo'));
 
 
 

@@ -15,19 +15,38 @@ const {
 } = require('./data');
 
 class Fragment {
-  constructor({ id, ownerId, created, updated, type, size = 0 }) {
+  constructor({ id = randomUUID(), ownerId, created, updated, type, size = 0 }) {
     // TODO
-    if(!ownerId || !type)
-        throw new Error("you must provide ownerId and type");
-    else if(typeof size != 'number' || size < 0)
-        throw new Error("size must be a number >= 0");
-    else if(!Fragment.isSupportedType(type))
-        throw new Error("The type is not supported");
+    if (!ownerId || !type) throw 'Missing ownerId or type arguments';
 
-    this.id = id || randomUUID();
+    if (typeof size != 'number' || size < 0) throw "Size isn't a number";
+
+    if (
+      type != 'text/plain' &&
+      type != 'text/plain; charset=utf-8' &&
+      type != 'text/markdown' &&
+      type != 'text/html' &&
+      type != 'text/*' &&
+      type != 'application/json' &&
+      type != 'image/png' &&
+      type != 'image/jpeg' &&
+      type != 'image/webp' &&
+      type != 'image/gif'
+    )
+      throw 'Incorrect type.';
+
+    if (!created) {
+      created = new Date().toISOString();
+    }
+
+    if (!updated) {
+      updated = new Date().toISOString();
+    }
+
+    this.id = id;
     this.ownerId = ownerId;
-    this.created = created || new Date().toISOString();
-    this.updated = updated || new Date().toISOString();
+    this.created = created;
+    this.updated = updated;
     this.type = type;
     this.size = size;
   }
@@ -39,11 +58,17 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    try{
-        const fragments = await listFragments(ownerId, expand);
-        return Promise.resolve(fragments);
-    } catch (error){
-        return Promise.reject(error);
+    // TODO
+    try {
+      if (listFragments(ownerId, expand) == undefined) throw 'No owner found';
+      const frags = await listFragments(ownerId, expand);
+      if (expand) {
+        return frags.map((fragment) => new Fragment(fragment));
+      } else {
+        return frags;
+      }
+    } catch (error) {
+      return Promise.reject(new Error(error));
     }
   }
 
@@ -55,13 +80,11 @@ class Fragment {
    */
   static async byId(ownerId, id) {
     // TODO
-    try{
-        const fragment = await readFragment(ownerId, id);
-        if (!fragment)
-            throw new Error("no fragment found");
-        return fragment;
-    } catch(error){
-        return Promise.reject(error);
+    try {
+      if ((await readFragment(ownerId, id)) == undefined) throw 'No fragment found';
+      return await readFragment(ownerId, id);
+    } catch (error) {
+      return Promise.reject(new Error(error));
     }
   }
 
@@ -73,12 +96,11 @@ class Fragment {
    */
   static delete(ownerId, id) {
     // TODO
-    try{
-        if(readFragment(ownerId, id) == undefined)
-            throw new Error("can not delete nonexistent fragment");
-        return deleteFragment(ownerId, id);
-    } catch(error){
-        return Promise.reject(error);
+    try {
+      if (readFragment(ownerId, id) == undefined) throw 'No fragment found';
+      return deleteFragment(ownerId, id);
+    } catch (error) {
+      return Promise.reject(new Error(error));
     }
   }
 
@@ -88,11 +110,12 @@ class Fragment {
    */
   save() {
     // TODO
-    try{
-        this.updated = new Date().toISOString();
-        return writeFragment(this);
-    } catch(error){
-        return Promise.reject(error);
+    try {
+      if (readFragment(this.ownerId, this.id) == undefined) throw 'No fragment found';
+      this.updated = new Date().toISOString();
+      return writeFragment(this);
+    } catch (error) {
+      return Promise.reject(new Error(error));
     }
   }
 
@@ -102,10 +125,11 @@ class Fragment {
    */
   getData() {
     // TODO
-    try{
-        return readFragmentData(this.ownerId, this.id);
-    } catch(error){
-        return Promise.reject(error);
+    try {
+      if (readFragment(this.ownerId, this.id) == undefined) throw 'No fragment found';
+      return readFragmentData(this.ownerId, this.id);
+    } catch (error) {
+      return Promise.reject(new Error(error));
     }
   }
 
@@ -116,14 +140,13 @@ class Fragment {
    */
   async setData(data) {
     // TODO
-    try{
-        if(!Buffer.isBuffer(data))
-            throw new Error("data must be buffer");
-        this.updated = new Date().toISOString();
-        this.size = Buffer.from(data).length;
-        return writeFragmentData(this.ownerId, this.id, data);
-    } catch(error){
-        return Promise.reject(error);
+    try {
+      if (readFragment(this.ownerId, this.id) == undefined) throw 'No fragment found';
+      this.updated = new Date().toISOString();
+      this.size = Buffer.from(data).length;
+      return writeFragmentData(this.ownerId, this.id, data);
+    } catch (error) {
+      return Promise.reject(new Error(error));
     }
   }
 
@@ -143,7 +166,18 @@ class Fragment {
    */
   get isText() {
     // TODO
-    return this.mimeType.includes('text');
+    const { type } = contentType.parse(this.type);
+    if (
+      type == 'text/plain' ||
+      type == 'text/plain; charset=utf-8' ||
+      type == 'text/markdown' ||
+      type == 'text/html' ||
+      type == 'text/*'
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -152,9 +186,38 @@ class Fragment {
    */
   get formats() {
     // TODO
-    if (this.mimeType === 'text/plain')
-        return ['text/plain'];
-    return [];
+    // const formats = [
+    //   'text/plain',
+    //   'text/plain; charset=utf-8',
+    //   'text/markdown',
+    //   'text/html',
+    //   'text/*',
+    //   'application/json',
+    // ];
+    const formats = [];
+    if (this.mimeType == 'text/plain') {
+      formats.push(contentType.format({ type: 'text/plain' }));
+    } else if (this.mimeType == 'text/plain; charset=utf-8') {
+      formats.push(contentType.format({ type: 'text/plain; charset=utf-8' }));
+    } else if (this.mimeType == 'text/markdown') {
+      formats.push(contentType.format({ type: 'text/markdown' }));
+    } else if (this.mimeType == 'text/html') {
+      formats.push(contentType.format({ type: 'text/html' }));
+    } else if (this.mimeType == 'text/*') {
+      formats.push(contentType.format({ type: 'text/*' }));
+    } else if (this.mimeType == 'application/json') {
+      formats.push(contentType.format({ type: 'application/json' }));
+    } else if (this.mimeType == 'image/png') {
+      formats.push(contentType.format({ type: 'image/png' }));
+    } else if (this.mimeType == 'image/jpeg') {
+      formats.push(contentType.format({ type: 'image/jpeg' }));
+    } else if (this.mimeType == 'image/webp') {
+      formats.push(contentType.format({ type: 'image/webp' }));
+    } else if (this.mimeType == 'image/gif') {
+      formats.push(contentType.format({ type: 'image/gif' }));
+    }
+
+    return formats;
   }
 
   /**
@@ -164,19 +227,22 @@ class Fragment {
    */
   static isSupportedType(value) {
     // TODO
-    if(value=='text/plain' || value=='text/plain; charset=utf-8')
-        return true;
-    else
-        return false;
-
-
-    // const validTypes = [
-    //   'text/plain',
-    //   // Add other supported types in the future here:
-    // ];
-
-    // return validTypes.includes(value);
-
+    if (
+      value == 'text/plain' ||
+      value == 'text/plain; charset=utf-8' ||
+      value == 'text/markdown' ||
+      value == 'text/html' ||
+      value == 'text/*' ||
+      value == 'application/json' ||
+      value == 'image/png' ||
+      value == 'image/jpeg' ||
+      value == 'image/webp' ||
+      value == 'image/gif'
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
