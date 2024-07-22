@@ -4,6 +4,7 @@ const {createSuccessResponse, createErrorResponse} = require('../../response');
 const {Fragment} = require('../../model/fragment');
 const logger = require('../../logger');
 
+const API_URL = process.env.API_URL;
 
 module.exports = async (req, res)=>{
     logger.debug('Post: ' + req.body);
@@ -20,7 +21,8 @@ module.exports = async (req, res)=>{
         logger.debug('New fragment created: ' + JSON.stringify(fragment));
     
         res.set('Content-Type', fragment.type);
-        res.set('Location', `${process.env.API_URL}/v1/fragments/${fragment.id}`);
+       // res.set('Location', `${process.env.API_URL}/v1/fragments/${fragment.id}`);
+        res.set('Location', API_URL + '/v1/fragments/' + fragment.id);
         res.status(201).json(
           createSuccessResponse({
             fragment: fragment,
