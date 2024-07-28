@@ -18,16 +18,16 @@
             "essential": true,
             "environment": [
                 {
-                    "name": "NODE_ENV",
-                    "value": "development"
+                    "name": "AWS_REGION",
+                    "value": "us-east-1"
                 },
                 {
-                    "name": "API_URL",
-                    "value": "http://localhost:8080"
+                    "name": "AWS_COGNITO_POOL_ID",
+                    "value": "us-east-1_UDOcivaYb"
                 },
                 {
-                    "name": "PORT",
-                    "value": "80"
+                    "name": "AWS_COGNITO_CLIENT_ID",
+                    "value": "37rsplijcq561j6170vshkg6fu"
                 },
                 {
                     "name": "LOG_LEVEL",
@@ -36,6 +36,14 @@
                 {
                     "name": "HTPASSWD_FILE",
                     "value": "./tests/.htpasswd"
+                },
+                {
+                    "name": "PORT",
+                    "value": "80"
+                },
+                { 
+                    "name": "NODE_ENV", 
+                    "value": "development" 
                 }
             ],
             "environmentFiles": [],
