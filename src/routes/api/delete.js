@@ -1,7 +1,6 @@
 // src/routes/api/delete.js
 
-// Refactor to use response.js functions
-// const logger = require('../../logger');
+
 const { createSuccessResponse, createErrorResponse } = require('../../response');
 
 const { Fragment } = require('../../model/fragment');
