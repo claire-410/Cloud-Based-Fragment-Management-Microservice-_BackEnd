@@ -56,4 +56,5 @@ services:
       # See https://docs.localstack.cloud/localstack/configuration/ and
       # https://hub.docker.com/r/localstack/localstack for config details.
       # We only want to run S3
-      - SERVICES=s3,dynamodb
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
