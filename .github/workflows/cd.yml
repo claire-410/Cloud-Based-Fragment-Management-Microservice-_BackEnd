@@ -92,7 +92,10 @@ jobs:
             API_URL=http://fragments-lb-1522102815.us-east-1.elb.amazonaws.com/
             PORT=80
             HTPASSWD_FILE=tests/.htpasswd
-
+            AWS_REGION=us-east-1
+            AWS_COGNITO_POOL_ID=us-east-1_UDOcivaYb
+            AWS_COGNITO_CLIENT_ID=37rsplijcq561j6170vshkg6fu
+            
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
